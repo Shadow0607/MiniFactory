@@ -41,16 +41,16 @@ Kubernetes、Grafana 完整儀表板、壓測比較與 AI 異常分析屬於第�
 
 ```mermaid
 flowchart TD
-    UI\["Vue Dashboard"] -->|REST 建立／查詢| API\["ASP.NET Core API"]
+  UI["Vue Dashboard"] -->|REST 建立／查詢| API["ASP.NET Core API"]
     API -->|SignalR 推播| UI
-    API --> DB\[(PostgreSQL)]
-    API --> Redis\[(Redis：去重快取)]
+  API --> DB[(PostgreSQL)]
+  API --> Redis[(Redis：去重快取)]
     Worker --> Redis
-    Publisher\["Outbox Publisher"] --> DB
-    Publisher -->|批次發送| MQ\["RabbitMQ"]
-    MQ --> Worker\["Dispatch Worker"]
+  Publisher["Outbox Publisher"] --> DB
+  Publisher -->|批次發送| MQ["RabbitMQ"]
+  MQ --> Worker["Dispatch Worker"]
     Worker --> DB
-    Worker --> Sim\["Equipment Simulator"]
+  Worker --> Sim["Equipment Simulator"]
     Sim -->|執行結果／狀態| API
 ```
 
@@ -118,14 +118,14 @@ sequenceDiagram
 
 ```mermaid
 erDiagram
-    production\_orders ||--o{ production\_jobs : "包含"
-    production\_jobs ||--o{ job\_executions : "產生"
-    production\_jobs }o--|| equipment : "指派給"
-    equipment ||--o{ equipment\_status\_history : "記錄"
-    equipment ||--o{ simulator\_commands : "接收"
-    job\_executions ||--|| simulator\_commands : "對應 command\_id"
-    production\_orders ||--o{ order\_events : "產生"
-    production\_orders ||--o{ alerts : "觸發"
+  production_orders ||--o{ production_jobs : "包含"
+  production_jobs ||--o{ job_executions : "產生"
+  production_jobs }o--|| equipment : "指派給"
+  equipment ||--o{ equipment_status_history : "記錄"
+  equipment ||--o{ simulator_commands : "接收"
+  job_executions ||--|| simulator_commands : "對應 command_id"
+  production_orders ||--o{ order_events : "產生"
+  production_orders ||--o{ alerts : "觸發"
     equipment ||--o{ alerts : "觸發"
 ```
 
