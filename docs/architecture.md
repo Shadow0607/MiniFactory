@@ -191,7 +191,7 @@ MiniFactory/
 ├── Directory.Packages.props               # Central Package Management
 ├── .editorconfig
 ├── .gitattributes                         # `* text=auto`、`*.sh text eol=lf`（見下方說明）
-├── .gitignore                             # 含 `.claude/settings.local.json`
+├── .gitignore                             # 含整個 `.claude/`
 ├── .env.example                           # 只有變數名稱與假值
 ├── docker-compose.yml
 ├── docker-compose.override.yml            # 本機開發：開放 Simulator/DB 管理埠（選用）
@@ -270,7 +270,7 @@ MiniFactory/
 
 **開發環境注意（✅ 定案）**：
 - `.gitattributes` 設 `* text=auto` 與 `*.sh text eol=lf`。原因：Wayne 本機 `core.autocrlf=true`，若 `deploy/mariadb/initdb/*.sh`、`scripts/**/*.sh`、`.devcontainer/*.sh` 被轉成 CRLF，容器內執行 `set -eu\r` 會直接失敗。新增任何 shell 腳本都受此規則保護。
-- `.gitignore` 加入 `.claude/settings.local.json`（個人工具設定不進版控）。
+- `.gitignore` 加入整個 `.claude/`（Claude Code 個人工具設定與開發過程累積的權限，皆不進版控；2026-11-12 由原本只忽略 `settings.local.json` 擴大）。
 
 | 專案 | 職責 | 參考 |
 |-|-|-|

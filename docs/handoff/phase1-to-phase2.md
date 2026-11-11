@@ -69,7 +69,7 @@
 |-|-|-|
 | 第 1 輪 | 後端 18 項 | 資料存取一律經 `DbSession`、交易與隔離層級（READ COMMITTED）、MariaDB 錯誤碼對應、Idempotency 比對、Problem Details 與 413/400 行為、API Key 啟動檢查與 middleware 順序、限流預留、請求大小上限、Actions 以 SHA 釘版（S9）、`.gitignore` 金鑰檔規則（S8）等 |
 | 第 1 輪 | 前端 11 項 | 輸入 trim、Idempotency-Key 規則、API Key 只存 sessionStorage、輪詢與頁面可見性、錯誤顯示 |
-| 第 2 輪 | 後端 R1～R8 | 第 2 輪 code-reviewer / security-auditor 複審後的後端修正項：journal 獨立 database 與 Migrator 必填環境變數（結束碼 2）、外部 `traceparent` 不信任、限流漏標守護（R7）、`.claude/settings.local.json` 的 `.gitignore`（R8）等；R5 見 §5.1 |
+| 第 2 輪 | 後端 R1～R8 | 第 2 輪 code-reviewer / security-auditor 複審後的後端修正項：journal 獨立 database 與 Migrator 必填環境變數（結束碼 2）、外部 `traceparent` 不信任、限流漏標守護（R7）、`.claude/` 的 `.gitignore`（R8，2026-11-12 擴大為忽略整個目錄）等；R5 見 §5.1 |
 | 第 2 輪 | 前端 P1～P3 | 表單與錯誤處理細節 |
 
 編號來源：`tests/MiniFactory.IntegrationTests/Api/RepoConfigurationTests.cs` 中 B6、S8、S9 是第 1 輪（security-auditor 等）的項目編號，R8 是第 2 輪項目。各項的細部歸屬以原始審查紀錄為準；逐項審查紀錄沒有放進 repo【待確認：是否補存】。

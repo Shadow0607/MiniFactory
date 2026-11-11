@@ -35,5 +35,5 @@ dist/
 .DS_Store
 Thumbs.db
 
-# Claude Code 本機設定（個人偏好與權限，不提交；.claude/settings.json 為團隊共用，照常提交）
-.claude/settings.local.json
+# Claude Code 設定（個人工具設定與開發過程累積的權限，整個目錄都不提交）
+.claude/

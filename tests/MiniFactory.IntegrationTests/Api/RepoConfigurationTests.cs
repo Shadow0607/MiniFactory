@@ -38,14 +38,14 @@ public partial class RepoConfigurationTests
     }
 
     [Fact]
-    public void R8_GitIgnore_IgnoresClaudeLocalSettings_ButNotSharedSettings()
+    public void R8_GitIgnore_IgnoresWholeClaudeDirectory()
     {
         var lines = Read(".gitignore").Split('\n').Select(l => l.Trim()).ToArray();
 
-        Assert.Contains(".claude/settings.local.json", lines);
-        // 團隊共用的 settings.json 不可被忽略
-        Assert.DoesNotContain(".claude/", lines);
-        Assert.DoesNotContain(".claude/settings.json", lines);
+        // 整個 .claude/ 都是個人工具設定（含 settings.local.json 與累積的權限），一律不提交
+        Assert.Contains(".claude/", lines);
+        // 不可有反向規則把其中檔案重新納入版控
+        Assert.DoesNotContain(lines, l => l.StartsWith("!.claude", StringComparison.Ordinal));
     }
 
     [Fact]
