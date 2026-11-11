@@ -1,0 +1,115 @@
+# MiniFactory 基礎設施（Phase 1.2：mariadb / rabbitmq / redis）
+# 使用方式：cp .env.example .env（修改密碼）後 docker compose up -d
+# 主機埠預設 3306/5672/15672/6379（僅綁 127.0.0.1）；若被占用（例如 Windows 保留埠 6289-6388 含 6379），
+# 可用 MARIADB_HOST_PORT / RABBITMQ_AMQP_HOST_PORT / RABBITMQ_MGMT_HOST_PORT / REDIS_HOST_PORT 覆寫。
+# 其餘服務（api / worker / simulator / web / jaeger）於後續步驟加入；api / worker 之後以
+# depends_on: migrator（service_completed_successfully）等待遷移完成。
+# 資料庫帳號（mf_app / mf_migrator / mf_sim）由 deploy/mariadb/initdb 在「空 volume 第一次啟動」時建立；
+# 之後修改 .env 的密碼不會同步到既有 volume（需 docker compose down -v 重建，或手動 ALTER USER）。
+# 連線字串以分號分隔欄位，所以 MF_*_PASSWORD 請避免使用 ; 與 " 字元。
+name: minifactory
+
+services:
+  mariadb:
+    image: mariadb:10.11.11 # 與正式環境 NAS 的 MariaDB 10.11.11 對齊（10.11 為 LTS 系列）
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:?請在 .env 設定 MARIADB_ROOT_PASSWORD}
+      # 以下由 initdb 腳本讀取，建立 database 與三個最小權限帳號（database.md §1、architecture.md §16）
+      MF_APP_USER: ${MF_APP_USER:-mf_app}
+      MF_APP_PASSWORD: ${MF_APP_PASSWORD:?請在 .env 設定 MF_APP_PASSWORD}
+      MF_MIGRATOR_USER: ${MF_MIGRATOR_USER:-mf_migrator}
+      MF_MIGRATOR_PASSWORD: ${MF_MIGRATOR_PASSWORD:?請在 .env 設定 MF_MIGRATOR_PASSWORD}
+      MF_SIM_USER: ${MF_SIM_USER:-mf_sim}
+      MF_SIM_PASSWORD: ${MF_SIM_PASSWORD:?請在 .env 設定 MF_SIM_PASSWORD}
+      MF_DB_USER_HOST: ${MF_DB_USER_HOST:-%}
+      TZ: UTC
+    # 與 architecture.md §16 一致；READ COMMITTED 與鎖等待逾時為保險，應用程式交易本身也會明確指定 READ COMMITTED
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --transaction-isolation=READ-COMMITTED
+      - --innodb-lock-wait-timeout=10
+    ports:
+      - "127.0.0.1:${MARIADB_HOST_PORT:-3306}:3306"
+    volumes:
+      - mariadb-data:/var/lib/mysql
+      - ./deploy/mariadb/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      # 官方映像內建；首次初始化期間也會等 InnoDB 就緒
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks: [backend]
+
+  # 一次性遷移服務：以 mf_migrator 帳號執行 DbUp 後退出（ADR-012）。
+  # api / worker 之後以 depends_on: migrator（condition: service_completed_successfully）等待
+  migrator:
+    build:
+      context: .
+      dockerfile: src/MiniFactory.Migrator/Dockerfile
+    environment:
+      ConnectionStrings__MiniFactory: Server=mariadb;Port=3306;Database=minifactory;User ID=${MF_MIGRATOR_USER:-mf_migrator};Password=${MF_MIGRATOR_PASSWORD:?請在 .env 設定 MF_MIGRATOR_PASSWORD}
+      # DbUp journal（schemaversions）放在獨立 database，mf_app 沒有任何權限，無法竄改遷移紀錄（initdb 建立）
+      MIGRATIONS_JOURNAL_SCHEMA: minifactory_migrations
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    restart: "no"
+    networks: [backend]
+
+  rabbitmq:
+    image: rabbitmq:4.4-management-alpine
+    # 固定 hostname：RabbitMQ 以節點名稱（含 hostname）存放資料，容器重建後才找得到同一份資料
+    hostname: minifactory-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:?請在 .env 設定 RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:?請在 .env 設定 RABBITMQ_DEFAULT_PASS}
+    ports:
+      - "127.0.0.1:${RABBITMQ_AMQP_HOST_PORT:-5672}:5672"
+      - "127.0.0.1:${RABBITMQ_MGMT_HOST_PORT:-15672}:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    networks: [backend]
+
+  redis:
+    image: redis:8.10-alpine
+    # 純快取，不持久化（architecture.md §16）；REDIS_PASSWORD 有值才啟用密碼
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+    command:
+      - sh
+      - -c
+      - |
+        if [ -n "$$REDIS_PASSWORD" ]; then
+          exec redis-server --save "" --appendonly no --requirepass "$$REDIS_PASSWORD"
+        else
+          exec redis-server --save "" --appendonly no
+        fi
+    ports:
+      - "127.0.0.1:${REDIS_HOST_PORT:-6379}:6379"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - |
+          if [ -n "$$REDIS_PASSWORD" ]; then export REDISCLI_AUTH="$$REDIS_PASSWORD"; fi
+          redis-cli ping | grep -q PONG
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks: [backend]
+
+volumes:
+  mariadb-data:
+  rabbitmq-data:
+
+networks:
+  backend:

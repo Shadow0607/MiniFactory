@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+    <PackageReference Include="coverlet.MTP" />
+    <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" />
+    <PackageReference Include="Testcontainers.MariaDb" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\MiniFactory.Api\MiniFactory.Api.csproj" />
+    <ProjectReference Include="..\..\src\MiniFactory.Worker\MiniFactory.Worker.csproj" />
+    <ProjectReference Include="..\..\src\MiniFactory.Infrastructure\MiniFactory.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\MiniFactory.Simulator\MiniFactory.Simulator.csproj" />
+    <!-- 以子行程執行 Migrator，驗證結束碼（MigratorExitCodeTests） -->
+    <ProjectReference Include="..\..\src\MiniFactory.Migrator\MiniFactory.Migrator.csproj" />
+  </ItemGroup>
+
+</Project>

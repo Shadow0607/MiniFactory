@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\MiniFactory.Application\MiniFactory.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MySqlConnector" />
+    <PackageReference Include="Dapper" />
+    <PackageReference Include="dbup-mysql" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+
+  <!-- 整合測試需要檢查 internal 的 SQL 常數（例如確認未篩選時不帶 IN 子句） -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="MiniFactory.IntegrationTests" />
+  </ItemGroup>
+
+  <!-- DbUp 遷移腳本以 Embedded Resource 內嵌（ADR-018） -->
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\Scripts\*.sql" />
+  </ItemGroup>
+</Project>

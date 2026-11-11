@@ -1,0 +1,25 @@
+-- database.md 3.3 Job 執行紀錄。外鍵由後續腳本加入
+CREATE TABLE IF NOT EXISTS job_executions (
+  id               UUID          NOT NULL,
+  job_id           UUID          NOT NULL,
+  attempt_no       INT UNSIGNED  NOT NULL,
+  command_id       UUID          NOT NULL,
+  status           VARCHAR(32)   NOT NULL,
+  equipment_id     UUID          NULL,
+  send_count       INT UNSIGNED  NOT NULL DEFAULT 0,
+  last_sent_at     DATETIME(6)   NULL,
+  deadline_at      DATETIME(6)   NULL,
+  accepted_at      DATETIME(6)   NULL,
+  started_at       DATETIME(6)   NULL,
+  completed_at     DATETIME(6)   NULL,
+  error_code       VARCHAR(64)   NULL,
+  result_event_id  UUID          NULL,
+  version          INT UNSIGNED  NOT NULL DEFAULT 0,
+  created_at       DATETIME(6)   NOT NULL,
+  updated_at       DATETIME(6)   NOT NULL,
+  CONSTRAINT pk_job_executions PRIMARY KEY (id),
+  CONSTRAINT ux_job_executions_command_id UNIQUE (command_id),
+  CONSTRAINT ux_job_executions_job_id_attempt_no UNIQUE (job_id, attempt_no),
+  CONSTRAINT ck_job_executions_attempt_no CHECK (attempt_no >= 1),
+  CONSTRAINT ck_job_executions_status CHECK (status IN ('Pending','Dispatched','Accepted','Running','Unknown','Succeeded','Failed','Rejected','Abandoned'))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

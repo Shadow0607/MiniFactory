@@ -1,0 +1,27 @@
+-- database.md 4.1 Simulator 命令。與 MES 表沒有外鍵（跨 database），以 command_id 邏輯對應
+CREATE TABLE IF NOT EXISTS simulator_commands (
+  command_id            UUID           NOT NULL,
+  equipment_id          UUID           NOT NULL,
+  job_id                UUID           NOT NULL,
+  attempt_no            INT UNSIGNED   NOT NULL,
+  operation             VARCHAR(32)    NOT NULL,
+  request_payload       JSON           NOT NULL,
+  status                VARCHAR(16)    NOT NULL,
+  result                JSON           NULL,
+  error_code            VARCHAR(64)    NULL,
+  result_event_id       UUID           NULL,
+  accepted_at           DATETIME(6)    NOT NULL,
+  started_at            DATETIME(6)    NULL,
+  completed_at          DATETIME(6)    NULL,
+  reported_at           DATETIME(6)    NULL,
+  report_attempt_count  INT UNSIGNED   NOT NULL DEFAULT 0,
+  last_report_error     VARCHAR(1000)  NULL,
+  correlation_id        VARCHAR(64)    NULL,
+  trace_parent          VARCHAR(55)    NULL,
+  updated_at            DATETIME(6)    NOT NULL,
+  CONSTRAINT pk_simulator_commands PRIMARY KEY (command_id),
+  CONSTRAINT ux_simulator_commands_result_event_id UNIQUE (result_event_id),
+  CONSTRAINT ck_simulator_commands_status CHECK (status IN ('Accepted','Running','Succeeded','Failed','Rejected')),
+  CONSTRAINT ck_simulator_commands_request_payload CHECK (json_valid(request_payload)),
+  CONSTRAINT ck_simulator_commands_result CHECK (result IS NULL OR json_valid(result))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

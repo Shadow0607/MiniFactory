@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- 一次性遷移程式（ADR-012 / ADR-018）：以 mf_migrator 帳號對 database minifactory 執行 DbUp，結束後退出 -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>MiniFactory.Migrator</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MiniFactory.Infrastructure\MiniFactory.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

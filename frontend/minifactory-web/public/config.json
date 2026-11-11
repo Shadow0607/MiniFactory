@@ -1,0 +1,7 @@
+{
+  "apiBaseUrl": "/api",
+  "jaegerUiUrl": "http://localhost:16686",
+  "features": {
+    "alertResolve": false
+  }
+}

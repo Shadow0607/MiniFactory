@@ -1,0 +1,39 @@
+# .NET build
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+*.user
+*.suo
+*.userprefs
+.vs/
+.idea/
+*.swp
+
+# 測試與覆蓋率
+TestResults/
+coverage/
+*.trx
+*.coverage
+*.cobertura.xml
+
+# 機密與環境設定：只提交 .env.example
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+secrets.json
+
+# Node / 前端
+node_modules/
+dist/
+*.tsbuildinfo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code 本機設定（個人偏好與權限，不提交；.claude/settings.json 為團隊共用，照常提交）
+.claude/settings.local.json

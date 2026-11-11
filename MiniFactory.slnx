@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MiniFactory.Api/MiniFactory.Api.csproj" />
+    <Project Path="src/MiniFactory.Application/MiniFactory.Application.csproj" />
+    <Project Path="src/MiniFactory.Domain/MiniFactory.Domain.csproj" />
+    <Project Path="src/MiniFactory.Infrastructure/MiniFactory.Infrastructure.csproj" />
+    <Project Path="src/MiniFactory.Migrator/MiniFactory.Migrator.csproj" />
+    <Project Path="src/MiniFactory.Simulator/MiniFactory.Simulator.csproj" />
+    <Project Path="src/MiniFactory.Worker/MiniFactory.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MiniFactory.IntegrationTests/MiniFactory.IntegrationTests.csproj" />
+    <Project Path="tests/MiniFactory.UnitTests/MiniFactory.UnitTests.csproj" />
+  </Folder>
+</Solution>

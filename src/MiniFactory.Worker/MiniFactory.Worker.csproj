@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <ProjectReference Include="..\MiniFactory.Application\MiniFactory.Application.csproj" />
+    <ProjectReference Include="..\MiniFactory.Infrastructure\MiniFactory.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,13 @@
+# 換行字元規則：repo 內一律存 LF，避免 Windows core.autocrlf=true 時檔案被轉成 CRLF
+* text=auto
+
+# Shell 腳本在容器（Linux）內執行，工作目錄也必須保持 LF，否則 `set -eu\r` 會讓 initdb 失敗
+*.sh text eol=lf
+
+# 常見二進位檔，不做換行轉換
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary

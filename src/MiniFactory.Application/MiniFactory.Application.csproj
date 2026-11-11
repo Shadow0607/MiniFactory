@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\MiniFactory.Domain\MiniFactory.Domain.csproj" />
+  </ItemGroup>
+
+  <!-- Application 只相依 Domain 與 Microsoft.Extensions.* 抽象（architecture.md §3） -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+</Project>

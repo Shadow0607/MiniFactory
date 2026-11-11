@@ -1,0 +1,46 @@
+name: build-and-test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      # 第三方 Action 一律釘到 commit SHA（行尾註解版本號），避免 tag 被改寫；persist-credentials: false 不把 token 留在 .git/config
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      # 整合測試專案目前可為空；Testcontainers 於 ubuntu runner 可直接使用 Docker
+      # .NET 10 SDK 的 dotnet test 走 Microsoft.Testing.Platform（global.json 設定），
+      # 覆蓋率用 coverlet.MTP（--coverlet），TRX 用 --report-trx
+      - name: Test
+        run: >
+          dotnet test --no-build --configuration Release
+          --report-trx
+          --coverlet --coverlet-output-format cobertura
+          --results-directory ./TestResults
+
+      - name: Upload test results and coverage
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: test-results
+          path: TestResults/**
+          if-no-files-found: ignore

@@ -1,0 +1,15 @@
+# Docker build context 排除項（建置映像只需要原始碼與 props）
+**/bin/
+**/obj/
+.git/
+.github/
+.vs/
+.idea/
+docs/
+tests/
+frontend/
+TestResults/
+coverage/
+.env
+.env.*
+!.env.example

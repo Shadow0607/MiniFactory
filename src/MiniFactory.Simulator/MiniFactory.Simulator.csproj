@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <!-- Simulator 為獨立系統（ADR-006）：不參考任何 MiniFactory 專案，自行以 DbUp 遷移 database minifactory_sim -->
+  <ItemGroup>
+    <PackageReference Include="dbup-mysql" />
+    <!-- 明確參考新版：dbup-mysql 6.1.0 傳遞相依的 MySqlConnector 2.3.5 有已知弱點（GHSA-473q-m89c-ghf8） -->
+    <PackageReference Include="MySqlConnector" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Persistence\Migrations\Scripts\*.sql" />
+  </ItemGroup>
+</Project>
